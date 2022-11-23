@@ -1,9 +1,19 @@
 import * as React from 'react';
-import { Button, Form, Input, Select, FormProps, notification } from 'antd';
 import {
+  Button,
+  Form,
+  Input,
+  Select,
+  FormProps,
+  notification,
+  Typography,
+} from 'antd';
+import {
+  digestDocument,
   exportPrivateKey,
   exportPublicKey,
   generateRSAKeyPair,
+  sign,
 } from '../../utils/crypto';
 
 interface SignerFormValues {
@@ -15,7 +25,7 @@ interface SignerFormValues {
   signature: string;
 }
 
-const inititalFormValues: SignerFormValues = {
+const initialFormValues: SignerFormValues = {
   document: '',
   hash_function: 'SHA-256',
   key_length: 1024,
@@ -33,8 +43,9 @@ const Signer = () => {
       setGenerating(true);
       const { document, hash_function, key_length } = values;
 
+      const hashedDocument = await digestDocument(document, hash_function);
       const { publicKey, privateKey } = await generateRSAKeyPair(key_length);
-      const signature = '';
+      const signature = await sign(privateKey, hashedDocument);
 
       form.setFieldsValue({
         public_key: await exportPublicKey(publicKey),
@@ -54,12 +65,14 @@ const Signer = () => {
 
   return (
     <div style={{ padding: 16, paddingLeft: 16 * 5 }}>
-      {/* <Typography.Title>Signer</Typography.Title> */}
+      <Typography.Title style={{ textAlign: 'center' }} level={2}>
+        Signer
+      </Typography.Title>
       <Form
         layout="horizontal"
         form={form}
         onFinish={onFinish}
-        initialValues={inititalFormValues}
+        initialValues={initialFormValues}
         wrapperCol={{
           span: 16,
         }}
@@ -95,24 +108,19 @@ const Signer = () => {
         </Form.Item>
 
         <Form.Item label="  " colon={false}>
-          <Button
-            htmlType="submit"
-            type="primary"
-            size="large"
-            loading={isGenerating}
-          >
+          <Button htmlType="submit" type="primary" loading={isGenerating}>
             Generate
           </Button>
         </Form.Item>
 
         <Form.Item label="Public Key" name="public_key">
-          <Input.TextArea disabled />
+          <Input.TextArea readOnly rows={5} showCount />
         </Form.Item>
         <Form.Item label="Private Key" name="private_key">
-          <Input.TextArea disabled />
+          <Input.TextArea readOnly rows={5} showCount />
         </Form.Item>
         <Form.Item label="Signature" name="signature">
-          <Input.TextArea disabled />
+          <Input.TextArea readOnly rows={5} showCount />
         </Form.Item>
       </Form>
     </div>

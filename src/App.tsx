@@ -1,14 +1,14 @@
-import React from 'react';
+import * as React from 'react';
 import { Layout, Menu } from 'antd';
-import './App.css';
-import Routes from './routes';
 import { useHistory } from 'react-router';
+import Routes from './routes';
+import './App.css';
 
 function App() {
   const history = useHistory();
 
   return (
-    <Layout>
+    <Layout style={{ height: '100vh' }}>
       <Layout.Header>
         <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['1']}>
           <Menu.Item key="1" onClick={() => history.push('/signer')}>

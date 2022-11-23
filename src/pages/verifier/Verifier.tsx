@@ -1,5 +1,14 @@
 import * as React from 'react';
-import { Button, Form, Input, Select, FormProps } from 'antd';
+import {
+  Button,
+  Form,
+  Input,
+  Select,
+  FormProps,
+  notification,
+  Typography,
+} from 'antd';
+import { digestDocument, importPublicKey, verify } from '../../utils/crypto';
 
 interface VerifierFormValues {
   document: string;
@@ -8,7 +17,7 @@ interface VerifierFormValues {
   signature: string;
 }
 
-const inititalFormValues: VerifierFormValues = {
+const initialFormValues: VerifierFormValues = {
   document: '',
   hash_function: 'SHA-256',
   public_key: '',
@@ -24,8 +33,25 @@ const Verifier = () => {
   ) => {
     try {
       setIsVerifying(true);
-      const { document, hash_function } = values;
+      const { document, hash_function, public_key, signature } = values;
+      const hashedDocument = await digestDocument(document, hash_function);
+      const publicKey = await importPublicKey(public_key);
+
+      const isValid = await verify(publicKey, signature, hashedDocument);
+
+      if (isValid) {
+        notification.success({
+          message: 'Valid digital signature.',
+        });
+      } else {
+        notification.error({
+          message: 'Invalid digital signature.',
+        });
+      }
     } catch (error) {
+      notification.error({
+        message: 'Invalid digital signature.',
+      });
       console.log(error);
     } finally {
       setIsVerifying(false);
@@ -34,12 +60,14 @@ const Verifier = () => {
 
   return (
     <div style={{ padding: 16, paddingLeft: 16 * 5 }}>
-      {/* <Typography.Title>Signer</Typography.Title> */}
+      <Typography.Title style={{ textAlign: 'center' }} level={2}>
+        Verifier
+      </Typography.Title>
       <Form
         layout="horizontal"
         form={form}
         onFinish={onFinish}
-        initialValues={inititalFormValues}
+        initialValues={initialFormValues}
         wrapperCol={{
           span: 16,
         }}
@@ -60,7 +88,7 @@ const Verifier = () => {
           <Input.TextArea />
         </Form.Item>
         <Form.Item label="Hash function" name="hash_function" required>
-          <Select>
+          <Select disabled>
             <Select.Option value="SHA-256">SHA-256</Select.Option>
             <Select.Option value="SHA-512">SHA-512</Select.Option>
           </Select>
@@ -75,7 +103,7 @@ const Verifier = () => {
             },
           ]}
         >
-          <Input.TextArea />
+          <Input.TextArea rows={3} showCount />
         </Form.Item>
         <Form.Item
           label="Signature"
@@ -87,7 +115,7 @@ const Verifier = () => {
             },
           ]}
         >
-          <Input.TextArea />
+          <Input.TextArea rows={3} showCount />
         </Form.Item>
 
         <Form.Item label="  " colon={false}>

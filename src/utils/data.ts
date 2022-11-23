@@ -51,3 +51,13 @@ export function convertPemToBinary(pem: string): ArrayBuffer {
   }
   return base64StringToArrayBuffer(encoded);
 }
+
+export function stringToArrayBuffer(text: string): ArrayBuffer {
+  const encoder = new TextEncoder();
+  return encoder.encode(text);
+}
+
+export function arrayBufferToString(arrayBuffer: ArrayBuffer): string {
+  const decoder = new TextDecoder();
+  return decoder.decode(arrayBuffer);
+}

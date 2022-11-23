@@ -1,5 +1,10 @@
 // Reference: https://gist.github.com/deiu/2c3208c89fbc91d23226
-import { convertBinaryToPem, convertPemToBinary } from './data';
+import {
+  arrayBufferToString,
+  convertBinaryToPem,
+  convertPemToBinary,
+  stringToArrayBuffer,
+} from './data';
 
 const HASH_ALGORITHM = 'SHA-256';
 const SIGN_ALGORITHM = 'RSASSA-PKCS1-v1_5';
@@ -18,12 +23,9 @@ export async function digestDocument(
   text: string,
   algorithm: string
 ): Promise<string> {
-  const encoder = new TextEncoder();
-  const decoder = new TextDecoder();
-  const data = encoder.encode(text);
-
+  const data = stringToArrayBuffer(text);
   const hash = await crypto.subtle.digest(algorithm, data);
-  return decoder.decode(hash);
+  return arrayBufferToString(hash);
 }
 
 export async function importPublicKey(pem: string): Promise<CryptoKey> {
@@ -80,12 +82,24 @@ export async function generateRSAKeyPair(length: number) {
   return keyPair;
 }
 
-export function sign(): string {
-  // return window.crypto.subtle.sign(signAlgorithm, key, textToArrayBuffer(data))
-  return '';
+export async function sign(key: CryptoKey, data: string): Promise<string> {
+  const signature = await window.crypto.subtle.sign(
+    SIGN_ALGORITHM,
+    key,
+    stringToArrayBuffer(data)
+  );
+  return arrayBufferToString(signature);
 }
 
-export function verify(): boolean {
-  // return crypto.subtle.verify(signAlgorithm, pub, sig, data)
-  return true;
+export async function verify(
+  key: CryptoKey,
+  signature: string,
+  data: string
+): Promise<boolean> {
+  return crypto.subtle.verify(
+    SIGN_ALGORITHM,
+    key,
+    stringToArrayBuffer(signature),
+    stringToArrayBuffer(data)
+  );
 }
