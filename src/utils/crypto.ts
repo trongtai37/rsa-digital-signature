@@ -1,6 +1,8 @@
 // Reference: https://gist.github.com/deiu/2c3208c89fbc91d23226
 import {
+  arrayBufferToBase64String,
   arrayBufferToString,
+  base64StringToArrayBuffer,
   convertBinaryToPem,
   convertPemToBinary,
   stringToArrayBuffer,
@@ -88,7 +90,7 @@ export async function sign(key: CryptoKey, data: string): Promise<string> {
     key,
     stringToArrayBuffer(data)
   );
-  return arrayBufferToString(signature);
+  return arrayBufferToBase64String(signature);
 }
 
 export async function verify(
@@ -99,7 +101,7 @@ export async function verify(
   return crypto.subtle.verify(
     SIGN_ALGORITHM,
     key,
-    stringToArrayBuffer(signature),
+    base64StringToArrayBuffer(signature),
     stringToArrayBuffer(data)
   );
 }

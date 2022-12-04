@@ -95,7 +95,7 @@ const Signer = () => {
           <Input.TextArea />
         </Form.Item>
         <Form.Item label="Hash function" name="hash_function" required>
-          <Select>
+          <Select disabled>
             <Select.Option value="SHA-256">SHA-256</Select.Option>
             <Select.Option value="SHA-512">SHA-512</Select.Option>
           </Select>

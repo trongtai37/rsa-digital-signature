@@ -39,18 +39,15 @@ const Verifier = () => {
 
       const isValid = await verify(publicKey, signature, hashedDocument);
 
-      notification.success({
-        message: 'Valid digital signature.',
-      });
-      // if (isValid) {
-      //   notification.success({
-      //     message: 'Valid digital signature.',
-      //   });
-      // } else {
-      //   notification.error({
-      //     message: 'Invalid digital signature.',
-      //   });
-      // }
+      if (isValid) {
+        notification.success({
+          message: 'Valid digital signature.',
+        });
+      } else {
+        notification.error({
+          message: 'Invalid digital signature.',
+        });
+      }
     } catch (error) {
       notification.error({
         message: 'Invalid digital signature.',
@@ -106,7 +103,7 @@ const Verifier = () => {
             },
           ]}
         >
-          <Input.TextArea rows={3} showCount />
+          <Input.TextArea rows={5} showCount />
         </Form.Item>
         <Form.Item
           label="Signature"
@@ -118,7 +115,7 @@ const Verifier = () => {
             },
           ]}
         >
-          <Input.TextArea rows={3} showCount />
+          <Input.TextArea rows={5} showCount />
         </Form.Item>
 
         <Form.Item label="  " colon={false}>
